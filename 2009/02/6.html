@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Python script by program.think@gmail.com" />
+<meta name="provider" content="program-think.blogspot.com" />
+<link type="text/css" rel="stylesheet" href="../../css/program-think.css" />
+<title>如何成为优秀开发人员[6]：正确地做事（善用工具） - 编程随想的博客</title>
+</head>
+<body>
+<div id="main" style="width:100%;">
+<h1><a href="../../index.html" title="回到首页">如何成为优秀开发人员[6]：正确地做事（善用工具）</a></h1>
+<div class="post-info"><span class="date-header">2009-02-15</span><a href="../../tags/E8818CE59CBAE782B9E6BBB4.html" class="tag">职场点滴</a> </div>
+<hr/>
+<div class="post">
+&#12288;&#12288;俗话说“工欲善其事，必先利其器”，今天我们来说说和开发工具有关的话题。由于开发过程中会用到的工具多种多样，根据“<a href="../../2009/02/80-20-principle-0-overview.html">二八原理</a>”，我只挑选和开发最密切相关的少数几种工具来聊一聊。<a name='more'></a><!--program-think--><br /><br /><a name="editor"> </a><br /><h2>★编辑器</h2><br />&#12288;&#12288;编辑器显然是用的最频繁的工具了（尤其是对于经常写代码的人），但是很大一部分人不善于使用编辑器。因此我先来说一下对编辑器使用的一些体会。顺便提一下，如果你连盲打都没过关，请先去学打字，再回来看这个帖子。<br /><br /><h3>◇字体</h3><br />&#12288;&#12288;对于写代码而言，字体的选择是非常重要的（看起来舒服的字体起码能保护眼睛）。首先必须选择一种【等宽】的字体（比如 FixedSys、Courier New）；其次该字体必须能够【清楚地区分】如下几种容易混淆的字符，避免阅读代码的时候看错：<br /><blockquote style="font-family:Courier,monospace;">数字0　和　字母O<br />数字1　和　大写字母I　和　小写字母l　和　或运算符|<br />数字2　和　字母z<br />数字9　和　小写字母q<br />乘号*　和　字母X<br />分号;　和　冒号:</blockquote><br /><h3>◇颜色</h3><br />&#12288;&#12288;你使用的编辑器必须支持【自定义】的词法高亮（词法着色）。<br />&#12288;&#12288;对词法高亮进行设置时，至少要把：“代码注释、关键字、字符串、数字”这几种语法要素用不同的颜色区分开。当然，如果还能根据“类名、函数名、变量名等”进行着色，那就更好了。<br /><br /><h3>◇快捷键</h3><br />&#12288;&#12288;熟练地使用快捷键能大大提高编辑的效率。因为你的手不需要离开键盘去操纵鼠标。而且当编辑的文本比较大时，有些编辑命令即使用鼠标操作也挺费劲（比如全选、移动到文件尾），不如快捷键方便。<br />&#12288;&#12288;所以，你使用的编辑器必须支持快捷键（这个大多数都能做到），而且还必须支持编辑命令和快捷键的<b>绑定</b>（也就是自己设置某个编辑命令对应的快捷键），便于根据个人喜好设置快捷键。<br /><br /><h3>◇其它功能</h3><br />还有一些比较琐碎的功能，比如：代码自动缩进、自动补全、动态提示等等。最后，如果你需要经常在不同的操作系统上进行工作，那你的编辑器还必须得支持跨平台才行。<br />虽然说了这么多条条框框，但是符合全部要求的软件并不难找，比如<a href="http://www.gnu.org/software/emacs/" target="_blank" rel="nofollow">Emacs</a>、<a href="http://www.vim.org/" target="_blank" rel="nofollow">VIM</a>、<a href="http://www.eclipse.org/" target="_blank" rel="nofollow">Eclipse</a>等软件都可以满足上述的编辑功能，具体选哪个就看各自的偏爱了。<br /><br /><a name="rcs"> </a><br /><h2>★源代码管理工具（版本管理软件）</h2><br />&#12288;&#12288;为了打字方便，以下简称“RCS”（Revision Control System）。<br />&#12288;&#12288;通过 RCS 的使用状况，可以看出一个开发团队在软件工程方面的成熟度，因此我们接下来要说说 RCS 的问题。如果你所在的开发团队从来不使用 RCS 进行代码的版本控制，那俺建议你赶紧考虑跳槽。<br />&#12288;&#12288;据俺多年的观察，发觉 RCS 主要有如下几种误用的情况：<br /><br /><h3>◇不正确的提交频度</h3><br />&#12288;&#12288;有很多新手不习惯使用 RCS，很少进行代码的提交。有些人甚至到项目快结束时还没有提交过一行代码。结果导致整个 RCS 形同虚设。<br />&#12288;&#12288;还有一些人则走向另一个极端，频繁提交代码。有些人每改完一个文件就提交一次，还有些人甚至把修改一半，尚【不能】编译通过的代码也提交到 RCS。<br />&#12288;&#12288;俺个人认为，正确的提交频度应该分两种情况：在编写功能代码时，每完成一个功能点，并且自己经过了自测之后，提交一次；在调试的时候，每修复一个 bug，提交一次。这样能够保证提交到 RCS 的代码都是【能编译通过】的（详见<a href="../../2009/02/daily-build-0-overview.html">每日构建系列</a>），并且业务逻辑上也是相对完整的（对于每日构建后的测试很重要）。<br /><br /><h3>◇提交时不写注释</h3><br />&#12288;&#12288;很多人提交代码时不写注释，将来再想到版本历史里面找代码就犹如大海捞针般困难。<br />&#12288;&#12288;比如在俺经手的代码中，有些源代码文件历时3年，提交次数上百次，如果提交时不写注释，日后根本没法找。<br /><br /><h3>◇不做代码基线（Baseline）、不做代码分支（Branch）</h3><br />&#12288;&#12288;在正规的开发团队，每当有一个版本发布（Release）并交付给用户使用时，都需要在 RCS 中制作一个基线，以便于进行相应的 bug 跟踪和补丁制作。因此，诸如【做基线】之类的事情，属于整个团队的集体行为，需要由 Team Leader 牵头来搞。<br />&#12288;&#12288;假如一个开发团队从来不做代码基线或者代码分支，仅仅是把 RCS 当成一个源文件的备份工具来用，那至少说明这个团队的 Team Leader 在软件工程管理方面非常失败。<br /><br /><a name="test"> </a><br /><h2>★用于调试/测试的运行辅助工具</h2><br />&#12288;&#12288;运行辅助工具对于开发效率的影响也很大。一般来说，你自己的开发机器上要有尽可能仿真（和用户的环境相似）的运行环境，并且运行辅助工具能够有效地发现运行时的一些不正常的信息。这样有利于让 bug 在交付给用户之前【尽早暴露】出来。<br />&#12288;&#12288;如果你是 Web 开发人员，那么你自己肯定要安装好常用的浏览器（至少包括 IE、Firefox、Chrome）。对于 IE，还得设置成“显示脚本错误通知”。<br />&#12288;&#12288;如果你主要开发 Windows 应用程序，你手头肯定要备好诸如：<a href="https://en.wikipedia.org/wiki/Dependency_walker" target="_blank" rel="nofollow">Depends</a>（Visual C++自带）、<a href="https://en.wikipedia.org/wiki/Process_Explorer" target="_blank" rel="nofollow">Process Explorer</a>等工具，便于查看进程、线程、动态库、堆内存等运行时信息。<br />&#12288;&#12288;如果你是搞手机应用的，那么你至少得有目标系统的模拟器软件（如果能配一个真机当然更好）。<br />&#12288;&#12288;如果你主要进行跨平台方面的开发，那么诸如“<a href="https://en.wikipedia.org/wiki/VMware" target="_blank" rel="nofollow">VMware</a> / <a href="https://en.wikipedia.org/wiki/VirtualBox" target="_blank" rel="nofollow">VirtualBox</a>”之类的虚拟化软件是必不可少滴（关于这类软件，俺写过一个系列：《<a href="../../2012/10/system-vm-0.html">扫盲操作系统虚拟机</a>》）<br />......<br /><br />&#12288;&#12288;限于篇幅，今天就只说这些。其它我未提及的工具，大伙儿自己可以举一反三。下一个话题，打算说说“<a href="../../2009/02/7.html">善用自动化</a>”。<div class="blogger-post-footer">
+</div>
+<hr/>
+<div class="copyright">
+<h4>版权声明</h4>
+本博客所有的原创文章，作者皆保留版权。转载必须包含本声明，保持本文完整，并以超链接形式注明作者<a href="mailto:program.think@gmail.com">编程随想</a>和本文原始网址：<br>
+<a href="https://program-think.blogspot.com/2009/02/6.html">https://program-think.blogspot.com/2009/02/6.html</a>
+</div>
+</div>
+</body>
+</html>

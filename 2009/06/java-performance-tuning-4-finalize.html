@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Python script by program.think@gmail.com" />
+<meta name="provider" content="program-think.blogspot.com" />
+<link type="text/css" rel="stylesheet" href="../../css/program-think.css" />
+<title>Java 性能优化[4]：关于 finalize 函数 - 编程随想的博客</title>
+</head>
+<body>
+<div id="main" style="width:100%;">
+<h1><a href="../../index.html" title="回到首页">Java 性能优化[4]：关于 finalize 函数</a></h1>
+<div class="post-info"><span class="date-header">2009-06-26</span><a href="../../tags/E7BC96E7A88B.html" class="tag">编程</a> <a href="../../tags/E7BC96E7A88B.Java.html" class="tag">编程.Java</a> <a href="../../tags/E7BC96E7A88B.E680A7E883BDE4BC98E58C96.html" class="tag">编程.性能优化</a> </div>
+<hr/>
+<div class="post">
+&#12288;&#12288;<a href="../../2009/04/java-performance-tuning-3-gc.html">上次的帖子</a>聊了垃圾回收器的调优，当时啰嗦了比较长的篇幅，就没再继续提 finalize 的事儿（其实这玩意儿和 GC 是沾点儿边的）。今天咱就把 finalize 函数相关的性能话题拿来说一下。<a name='more'></a><!--program-think--><br /><br /><br /><h2>★finalize 函数的调用机制</h2><br />&#12288;&#12288;俺经常啰嗦：“了解本质机制的重要性”。所以今天也得先谈谈 finalize 函数的调用机制。在聊之前，先声明一下：Java虚拟机规范（见“<a href="http://java.sun.com/docs/books/jvms/second_edition/html/VMSpecTOC.doc.html" target="_blank" rel="nofollow">这里</a>”），并没有硬性规定垃圾回收该不该搞，以及该如何搞。所以俺这里提到的 finalize 函数的调用机制，或许适用于大多数 JVM，但【不保证】适用于所有的 JVM。<br /><br /><h3>◇何时被调用？</h3><br />&#12288;&#12288;finalize 啥时候才会被调用捏？一般来说，要等到JVM开始进行垃圾回收的时候，它才【<b>有可能</b>】被调用。而 JVM 进行垃圾回收的时间点是【非常】不确定的，依赖于各种运行时的环境因素。具体细节可以参见“<a href="../../2009/04/java-performance-tuning-3-gc.html">本系列前一帖</a>”。正是由于 finalize 函数调用时间点的不确定，导致了后面提到的某些缺点。<br /><br /><h3>◇谁来调用？</h3><br />&#12288;&#12288;说完何时调用，咱接着来聊一下被谁调用？<br />&#12288;&#12288;常见的 JVM 会通过 GC 的垃圾回收线程来进行 finalize 函数的调用。由于垃圾回收线程比较重要（人家好歹也是 JVM 的一个组成部分嘛），为了防止 finalize 函数抛出的异常影响到垃圾回收线程的运作，垃圾回收线程会在调用每一个 finalize 函数时进行 try/catch，如果捕获到异常，就直接丢弃，然后接着处理下一个失效对象的 finalize 函数。<br /><br /><br /><h2>★对 finalize 函数的误解和误用</h2><br /><h3>◇把 finalize 理解为“析构函数”</h3><br />&#12288;&#12288;学过 C++ 的同学应该都知道“析构函数”（不懂 C++ 的同学直接跳过此小节）。C++ 析构函数是在对象离开作用域的当口，【立即】被调用的。<br />&#12288;&#12288;很多从 C++ 转 Java 的同学会想当然地把 Java 的 finalize 函数牵强附会成 C++ 的析构函数（两者确实有某些相似之处）。然而，现实往往不是这么美好滴。由于 Java 的 finalize 函数和 C++ 的析构函数之间有许多非常【关键性】的差异，那些把 finalize 拿来当析构函数用的同学，是注定要碰壁滴（具体请看本文后面“finalize 函数的缺点”）。<br /><br /><h3>◇依靠 finalize 来释放资源</h3><br />&#12288;&#12288;很多同学寄希望于通过 finalize() 来完成类对象中某些资源的释放（比如关闭数据库连接之类）。<br />&#12288;&#12288;有这种企图的同学，请注意看本文后面的“finalize 函数的缺点”！<br /><br /><br /><h2>★使用 finalize 函数的注意事项</h2><br />&#12288;&#12288;下面介绍的注意事项，有些可能和性能优化关系不大，俺也一并列出来。<br /><br /><h3>◇调用时间不确定——有资源浪费的风险</h3><br />&#12288;&#12288;前面已经介绍了调用机制。同学们应该认清【<b>finalize 的调用时机是很不确定的</b>】这样一个事实。所以，假如你把某些稀缺资源放到 finalize() 中释放，可能会导致该稀缺资源等上很久很久很久以后才被释放。这可是资源的浪费啊！<br />&#12288;&#12288;另外，某些类对象所携带的资源（比如某些 JDBC 的类）可能本身就很耗费内存，这些资源的延迟释放会造成很大的性能问题。<br /><br /><h3>◇可能不被调用——有资源泄漏的风险</h3><br />&#12288;&#12288;很多同学误以为 finalize() 总是会被调用，【其实不然】。在某些情况下，finalize() 压根儿不被调用。比如在 JVM 退出的当口，内存中那些对象的 finalize 函数可能就不会被调用了。<br />&#12288;&#12288;俺估摸着：还有同学在打 “runFinalizersOnExit” 的主意，来确保所有的 finalize 在 JVM 退出前被调用。但是，很可惜也很遗憾，该方法从 JDK 1.2 开始，就已经被废弃了。即使该方法不被废弃，也是有很大的线程安全隐患滴！企图打这个主意的同学，趁早死了这条心吧！<br />&#12288;&#12288;从上述可以看出，一旦你依赖 finalize() 来帮你释放资源，那可是很不妙啊（【有资源泄漏的危险】）！关于资源泄漏的严重性，俺在“<a href="../../2009/02/defect-of-java-beginner-3-code-style.html#gc">这里</a>”曾经提到过。很多时候，资源泄露导致的性能问题更加严重，万万不可小看。<br /><br /><h3>◇对象可能在 finalize 函数调用时复活——有诈尸的风险</h3><br />&#12288;&#12288;诈尸的情况比较少见，不过俺还是稍微提一下。<br />&#12288;&#12288;本来，只有当某个对象已经失效（没有引用），垃圾回收器才会调用该对象的 finalize 函数。但是，万一碰上某个变态的程序员，在 finalize() 函数内部再把对象自身的引用（也就是 this）重新保存在某处，也就相当于把自己复活了（因为这个对象重新有了引用，不再处于失效状态）。这种做法是不是够变态啊 :-)<br />&#12288;&#12288;为了防止发生这种诡异的事情，垃圾回收器只能在每次调用完 finalize() 之后再次去检查该对象是否还处于失效状态。这无形中又增加了 JVM 的开销。<br />&#12288;&#12288;随便提一下。由于 JDK 的文档中规定了（具体参见“<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/lang/Object.html#finalize%28%29" target="_blank" rel="nofollow">这里</a>”），JVM 对于每一个类对象实例最多只会调用一次 finalize()。所以，对于那些诈尸的实例，当它们真正死亡时，finalize() 反而不会被调用了。这看起来是不是很奇怪？<br /><br /><h3>◇要记得自己做异常捕获</h3><br />&#12288;&#12288;刚才在介绍 finalize() 调用机制时提到，一旦有异常抛出到 finalize 函数外面，会被垃圾回收线程捕获并丢弃。也就是说，异常被忽略掉了（异常被忽略的危害，“<a href="../../2009/02/defect-of-java-beginner-4-exception.html">这里</a>”有提到）。为了防止这种事儿，凡是 finalize() 中有可能抛出异常的代码，你都得写上 try catch 语句，自己进行捕获。<br /><br /><h3>◇要小心线程安全</h3><br />&#12288;&#12288;由于调用 finalize() 的是垃圾回收线程，和你自己代码的线程不是同一个线程；甚至不同对象的 finalize() 可能会被不同的垃圾回收线程调用（比如使用“并行收集器”的时候）。所以，当你在 finalize() 里面访问某些数据的时候，还得时刻留心线程安全的问题。<br /><br /><br /><h2>★结论</h2><br />&#12288;&#12288;前面废了这么多话，最后稍微总结一下。俺窃以为：finalize 实在是 Java 的鸡肋。或许它对于【极少数】程序员有用，但对于大多数人（包括俺自个儿），这玩意儿压根儿没啥好处。大伙儿还是尽量不用为妙。<br /><br /><br /><a href="../../2009/03/java-performance-tuning-0-overview.html#index">回到本系列的目录</a><div class="blogger-post-footer">
+</div>
+<hr/>
+<div class="copyright">
+<h4>版权声明</h4>
+本博客所有的原创文章，作者皆保留版权。转载必须包含本声明，保持本文完整，并以超链接形式注明作者<a href="mailto:program.think@gmail.com">编程随想</a>和本文原始网址：<br>
+<a href="https://program-think.blogspot.com/2009/06/java-performance-tuning-4-finalize.html">https://program-think.blogspot.com/2009/06/java-performance-tuning-4-finalize.html</a>
+</div>
+</div>
+</body>
+</html>

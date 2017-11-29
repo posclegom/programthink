@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Python script by program.think@gmail.com" />
+<meta name="provider" content="program-think.blogspot.com" />
+<link type="text/css" rel="stylesheet" href="../../css/program-think.css" />
+<title>架构设计：生产者/消费者模式[0]：概述 - 编程随想的博客</title>
+</head>
+<body>
+<div id="main" style="width:100%;">
+<h1><a href="../../index.html" title="回到首页">架构设计：生产者/消费者模式[0]：概述</a></h1>
+<div class="post-info"><span class="date-header">2009-03-25</span><a href="../../tags/E7BC96E7A88B.html" class="tag">编程</a> <a href="../../tags/E7BC96E7A88B.E69EB6E69E84.html" class="tag">编程.架构</a> </div>
+<hr/>
+<div class="post">
+&#12288;&#12288;今天打算来介绍一下“生产者／消费者模式”，这玩意儿在很多开发领域都能派上用场。鉴于该模式很重要且相关内容比较丰富，俺打算分几个帖子逐一介绍。今天先来扫盲一把。如果你对这个模式已经比较了解，请跳过本帖子，直接看<a href="../../2009/03/producer-consumer-pattern-1-data.html">下一个帖子（关于如何确定数据单元）</a>。<a name='more'></a><!--program-think--><br />&#12288;&#12288;看到这里，可能有同学心中犯嘀咕了：在四人帮（Gang Of Four）的23种模式里面似乎没听说过这种嘛！其实 GOF 那经典的23种模式主要是基于 OO 的（从书名《Design Patterns: Elements of Reusable Object-Oriented Software》就可以看出来）。而 Pattern 实际上即可以是 OO 的 Pattern，也可以是非 OO 的 Pattern 的。<br /><br /><h2>★简介</h2><br />&#12288;&#12288;言归正传！在实际的软件开发过程中，经常会碰到如下场景：某个模块负责产生数据，这些数据由另一个模块来负责处理（此处的<b>模块</b>是广义的，可以是类、函数、线程、进程等）。产生数据的模块，就形象地称为【生产者】；而处理数据的模块，就称为【消费者】。<br />&#12288;&#12288;单单抽象出生产者和消费者，还够不上是生产者／消费者模式。该模式还需要有一个缓冲区处于生产者和消费者之间，作为一个中介。生产者把数据放入缓冲区，而消费者从缓冲区取出数据。大概的结构如下图。<br /><center><img src="../../images/2009/03/lwkhyGW9xUlynfMkTn8pkaBOyJx9U9H3sn_5r5_lkubIQzbyH4Lu8IVrvjQdh9DGH-txOF8ZgoLJRSgfFM7qTMa22dCQzwPBJNqbXASCz_2VvwVDmJGPCPcHR_xW7_fDLfcrn880" alt="不见图 请翻墙"></center><br />&#12288;&#12288;为了不至于太抽象，咱们举一个寄信的例子（虽说这年头寄信已经不时兴，但这个例子还是比较贴切的）。假设你要寄一封平信，大致过程如下：<br />1、你把信写好——相当于生产者制造数据<br />2、你把信放入邮筒——相当于生产者把数据放入缓冲区<br />3、邮递员把信从邮筒取出——相当于消费者把数据取出缓冲区<br />4、邮递员把信拿去邮局做相应的处理——相当于消费者处理数据<br /><br /><h2>★优点</h2><br />&#12288;&#12288;可能有同学会问了：这个缓冲区有什么用捏？为什么不让生产者直接调用消费者的某个函数，直接把数据传递过去捏？搞出这么个缓冲区作甚？<br />&#12288;&#12288;其实这里面是大有讲究的，大概有如下一些好处。<br /><br /><h3>◇解耦</h3><br />&#12288;&#12288;假设生产者和消费者分别是两个类。如果让生产者直接调用消费者的某个方法，那么生产者对于消费者就会产生依赖（也就是耦合）。将来如果消费者的代码发生变化，可能会影响到生产者。而如果两者都依赖于某个缓冲区，两者之间不直接依赖，耦合也就相应降低了。<br />&#12288;&#12288;接着上述的例子，如果不使用邮筒（也就是缓冲区），你必须得把信直接交给邮递员。有同学会说，直接给邮递员不是挺简单的嘛？其实不简单，你必须得认识谁是邮递员，才能把信给他（光凭身上穿的制服，万一有人假冒，就惨了）。这就产生和你和邮递员之间的依赖（相当于生产者和消费者的【强】耦合）。万一哪天邮递员换人了，你还要重新认识一下（相当于消费者变化导致修改生产者代码）。而邮筒相对邮递员来说比较固定，你依赖它的成本也就比较低（相当于和缓冲区之间的【弱】耦合）。<br /><br /><h3>◇支持并发（concurrency）</h3><br />&#12288;&#12288;生产者直接调用消费者的某个方法，还有另一个弊端。由于函数调用是同步的（或者叫阻塞的），在消费者的方法没有返回之前，生产者只好一直等在那边。万一消费者处理数据很慢，生产者就会白白糟蹋大好时光。<br />&#12288;&#12288;使用了生产者／消费者模式之后，生产者和消费者可以是两个独立的并发主体（常见的并发类型有进程和线程两种，后面的帖子会讲两种并发类型下的应用）。生产者把制造出来的数据往缓冲区一丢，就可以再去生产下一个数据。基本上不用依赖消费者的处理速度。<br />&#12288;&#12288;其实当初这个模式，主要就是用来处理并发问题的。<br />&#12288;&#12288;从寄信的例子来看。如果没有邮筒，你得拿着信傻站在路口等邮递员过来收（相当于生产者阻塞）；又或者邮递员得挨家挨户问，谁要寄信（相当于消费者轮询）。不管是哪种方法，都挺土的。<br /><br /><h3>◇支持忙闲不均</h3><br />&#12288;&#12288;缓冲区还有另一个好处。如果制造数据的速度时快时慢，缓冲区的好处就体现出来了。当数据制造快的时候，消费者来不及处理，未处理的数据可以暂时存在缓冲区中。等生产者的制造速度慢下来，消费者再慢慢处理掉。<br />&#12288;&#12288;为了充分复用、节省打字，俺再拿寄信的例子来说事儿。假设邮递员一次只能带走1000封信。万一某次碰上情人节（也可能是圣诞节）送贺卡，需要寄出去的信超过1000封，这时候邮筒这个缓冲区就派上用场了。邮递员把来不及带走的信暂存在邮筒中，等下次过来时再拿走。<br />&#12288;&#12288;费了这么多口水，希望原先不太了解生产者／消费者模式的同学能够明白它是怎么一回事。下一个帖子，首先聊一下“<a href="../../2009/03/producer-consumer-pattern-1-data.html">如何确定数据单元</a>”。<br /><br /><h2>★本系列的目录</h2><br />&#12288;&#12288;为了方便阅读，把本系列帖子的目录整理如下（需翻墙）：<a name="index"> </a><br />1. <a href="../../2009/03/producer-consumer-pattern-1-data.html">如何确定数据单元</a><br />2. <a href="../../2009/03/producer-consumer-pattern-2-queue.html">队列缓冲区</a><br />3. <a href="../../2009/04/producer-consumer-pattern-3-circle.html">环形缓冲区</a><br />4. <a href="../../2009/04/producer-consumer-pattern-4-double.html">双缓冲区</a><div class="blogger-post-footer">
+</div>
+<hr/>
+<div class="copyright">
+<h4>版权声明</h4>
+本博客所有的原创文章，作者皆保留版权。转载必须包含本声明，保持本文完整，并以超链接形式注明作者<a href="mailto:program.think@gmail.com">编程随想</a>和本文原始网址：<br>
+<a href="https://program-think.blogspot.com/2009/03/producer-consumer-pattern-0-overview.html">https://program-think.blogspot.com/2009/03/producer-consumer-pattern-0-overview.html</a>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Python script by program.think@gmail.com" />
+<meta name="provider" content="program-think.blogspot.com" />
+<link type="text/css" rel="stylesheet" href="../../css/program-think.css" />
+<title>C++ 的可移植性和跨平台开发[5]：操作系统 - 编程随想的博客</title>
+</head>
+<body>
+<div id="main" style="width:100%;">
+<h1><a href="../../index.html" title="回到首页">C++ 的可移植性和跨平台开发[5]：操作系统</a></h1>
+<div class="post-info"><span class="date-header">2009-02-07</span><a href="../../tags/E7BC96E7A88B.html" class="tag">编程</a> <a href="../../tags/E7BC96E7A88B.C.html" class="tag">编程.C</a> </div>
+<hr/>
+<div class="post">
+&#12288;&#12288;上一个帖子提到了“<a href="../../2009/01/cxx-cross-platform-develop-4-hardware.html">硬件体系</a>”相关的话题，今天来说说和操作系统相关的话题。<a name='more'></a><!--program-think--><br />&#12288;&#12288;为了打字省力，以下把 Linux 和各种 Unix 都统称为 <a href="https://en.wikipedia.org/wiki/Posix" target="_blank" rel="nofollow">Posix</a> 系统。<br /><br /><br /><h2>★文件系统（以下把 FileSystem 简称为 FS）</h2><br />&#12288;&#12288;刚开始搞跨平台开发的新手，多半都会碰上和 FS 相关的问题。所以先来聊一下 FS。<br />&#12288;&#12288;归纳下来，开发中容易碰上的 FS 差异主要有如下几个：目录分隔符的差异；大小写敏感的差异；路径中禁用字符的差异。<br />&#12288;&#12288;为了应对上述差异，你要注意如下几点：<br /><br /><h3>◇文件和目录命名要规范</h3><br />&#12288;&#12288;在给文件和目录命名时，尽量只使用字母和数字。<br />&#12288;&#12288;不要在【同一目录】下放两个【只有大小写不同】的文件（例如 foo.cpp 与 Foo.cpp）。<br />&#12288;&#12288;不要使用某些 OS 的保留字（例如 aux、con、nul、prn）作文件名或目录名。<br />&#12288;&#12288;提醒一下：<br />&#12288;&#12288;刚才说的命名，包括了源代码文件、二进制文件和运行时创建的其它文件。<br /><br /><h3>◇#include 语句要规范</h3><br />&#12288;&#12288;当你写 <b>#include</b> 语句时，要使用正斜线“/”（各平台通用）而【不要】使用反斜线“\”（仅在 Windows 家族可用）。<b>#include</b> 语句中的文件和目录名要和实际名称保持大小写【完全一致】。<br /><br /><h3>◇代码中涉及FS操作，尽量使用现成的库</h3><br />&#12288;&#12288;已经有很多成熟的、用于 FS 的第三方库（比如 <a href="http://www.boost.org/libs/filesystem/" target="_blank" rel="nofollow">boost::filesystem</a>）。如果你的代码涉及到 FS 的操作（比如目录遍历），尽量使用这些第三方库，可以帮你省不少事情。<br /><br /><br /><h2>★文本文件的 回车（CR）与 换行（LF）</h2><br />&#12288;&#12288;由于几个知名的操作系统对回车/换行的处理不一致，导致了这个很烦人的问题。<br />&#12288;&#12288;目前的局面是：Windows 同时使用 CR 和 LF；Linux 和大部分的 Unix 使用 LF；苹果的 Mac OS 系列使用 CR。<br />&#12288;&#12288;对于源代码管理，好在很多版本管理软件（比如 CVS、SVN、Git）都会智能地处理这个问题，让你从代码库取回本地的源码能适应本地的格式。<br />&#12288;&#12288;如果你的程序需要在运行时处理文本文件，要留意本文方式打开和二进制方式打开的区别。另外，如果涉及跨不同系统传输文本文件，要考虑进行适当的处理。<br /><br /><br /><h2>★文件搜索路径（包括搜索可执行文件和动态库）</h2><br />&#12288;&#12288;在 Windows 下，如果要执行文件或者加载动态库，一般会搜索当前目录；而 Posix 系统则不尽然。<br />&#12288;&#12288;所以，如果你的应用涉及到启动进程或加载动态库，就要小心这个差异。<br /><br /><br /><h2>★环境变量</h2><br />&#12288;&#12288;对于上述提到的搜索路径问题，有些同学想通过修改 PATH 和 LD_LIBRARY_PATH 来引入当前路径。<br />&#12288;&#12288;如果要使用这种方法，建议你只修改进程级的环境变量，不要修改系统级的环境变量（修改系统级有可能影响到同机的其它软件，产生副作用）。<br /><br /><br /><h2>★动态库</h2><br /><h3>◇动态库导出函数</h3><br />&#12288;&#12288;如果你的应用程序使用动态库，强烈建议动态库导出标准 C 风格的函数；尽量不要导出类，也不要导出涉及名称重载的函数。<br /><br /><h3>◇符号表</h3><br />&#12288;&#12288;如果在 Posix 系统中加载动态库，切记慎用 <b>RTLD_GLOBAL</b> 这个标志位。<br />&#12288;&#12288;这个标志位会 Enable 全局符号表，有可能会导致多个动态库之间的符号名冲突（一旦碰到这种事，会出现匪夷所思的运行时错误，极难调试）。<br />&#12288;&#12288;关于动态库的话题比较大，限于篇幅，以后有时间再单独写一个帖子讨论。<br /><br /><br /><h2>★服务/看守进程</h2><br />&#12288;&#12288;如果你不清楚服务和看守进程的概念，请看维基百科（<a href="https://en.wikipedia.org/wiki/Windows_service" target="_blank" rel="nofollow">这里</a>和<a href="https://en.wikipedia.org/wiki/Daemon_%28computer_software%29" target="_blank" rel="nofollow">这里</a>）。（为了叙述方便，以下统称服务）<br />&#12288;&#12288;由于 C++ 开发的模块大部分是后台模块，经常会碰到服务的问题。编写服务需要调用好几个系统相关的 API，导致了与操作系统的紧密耦合，很难用一套代码搞定。<br />&#12288;&#12288;因此，比较好的办法是抽象出一个通用的服务外壳，然后把业务逻辑代码作为动态库挂载到它下面。这样的话，至少保证了业务逻辑的代码只需要一套；服务外壳的代码虽然需要两套代码（一个用于 Windows、一个用于 Posix），但他们是业务无关的，可以很方便地重用。<br /><br /><br /><h2>★默认栈大小</h2><br />&#12288;&#12288;不同的操作系统，“栈的默认大小”差别很大，从几十 KB（据说 Symbian 只有12K，真抠门）到几 MB 不等。<br />&#12288;&#12288;因此，你事先要打听一下目标系统的默认栈大小，如果碰上像 Symbian 这样抠门的，可以考虑用编译器选项调大。当然，养成“<b>不在栈上定义大数组/大对象</b>”的好习惯也很重要，否则再大的栈也会被撑爆的。<br /><br /><br />&#12288;&#12288;看到这里，可能有同学要问了，为什么没聊进程管理和多线程的话题？欲知后事如何，且听<a href="../../2009/04/cxx-cross-platform-develop-6-thread.html">下回分解</a>。<br /><br /><br /><a href="../../2009/01/cxx-cross-platform-develop-0-overview.html#index">回到本系列的目录</a><div class="blogger-post-footer">
+</div>
+<hr/>
+<div class="copyright">
+<h4>版权声明</h4>
+本博客所有的原创文章，作者皆保留版权。转载必须包含本声明，保持本文完整，并以超链接形式注明作者<a href="mailto:program.think@gmail.com">编程随想</a>和本文原始网址：<br>
+<a href="https://program-think.blogspot.com/2009/02/cxx-cross-platform-develop-5-os.html">https://program-think.blogspot.com/2009/02/cxx-cross-platform-develop-5-os.html</a>
+</div>
+</div>
+</body>
+</html>

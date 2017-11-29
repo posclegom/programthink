@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Python script by program.think@gmail.com" />
+<meta name="provider" content="program-think.blogspot.com" />
+<link type="text/css" rel="stylesheet" href="../../css/program-think.css" />
+<title>架构设计：生产者/消费者模式[4]：双缓冲区 - 编程随想的博客</title>
+</head>
+<body>
+<div id="main" style="width:100%;">
+<h1><a href="../../index.html" title="回到首页">架构设计：生产者/消费者模式[4]：双缓冲区</a></h1>
+<div class="post-info"><span class="date-header">2009-04-16</span><a href="../../tags/E7BC96E7A88B.html" class="tag">编程</a> <a href="../../tags/E7BC96E7A88B.E5A49AE7BABFE7A88B.html" class="tag">编程.多线程</a> <a href="../../tags/E7BC96E7A88B.E69EB6E69E84.html" class="tag">编程.架构</a> </div>
+<hr/>
+<div class="post">
+&#12288;&#12288;“双缓冲区”是一个应用很广的手法。该手法用得最多的地方想必是屏幕绘制相关的领域（主要是为了减少屏幕闪烁）。另外，在设备驱动和工控方面，双缓冲也经常被使用。不过今天要聊的，并不是针对上述的某个具体领域，而是侧重于并发方面的同步/互斥开销。另外提醒一下，双缓冲方式和前面提到的队列缓冲、环形缓冲是可以结合使用滴。<a name='more'></a><!--program-think--><br /><br /><h2>★为啥要双缓冲区？</h2><br />&#12288;&#12288;记得前几天在<a href="../../2009/03/producer-consumer-pattern-2-queue.html">介绍队列缓冲区</a>时，提及了普通队列缓冲区的两个性能问题：“内存分配的开销”和“同步/互斥的开销”（健忘的同学，先回去看看<a href="../../2009/03/producer-consumer-pattern-2-queue.html">那个帖子</a>复习一下）。“内存分配的开销”已经在<a href="../../2009/04/producer-consumer-pattern-3-circle.html">介绍环形缓冲区</a>的时候解决了，而今天要介绍的双缓冲区，就是冲着同步/互斥的开销来的。<br />&#12288;&#12288;为了防止有人给咱扣上“过度设计”的大帽子，又得来一个事先声明：只有当同步或互斥的开销非常明显的时候，你才应该考虑双缓冲区的使用。否则的话，大伙儿还是老老实实用最基本、最简单的队列缓冲区吧。<br /><br /><h2>★双缓冲区的原理</h2><br />&#12288;&#12288;前面说了一通废话，现在开始切入正题，说说具体实现。<br />&#12288;&#12288;所谓“双缓冲区”，故名思义就是要有俩缓冲区（简称 A 和 B）。这俩缓冲区，总是一个用于生产者，另一个用于消费者。当俩缓冲区都操作完，再进行一次切换（先前被生产者写入的转为消费者读出，先前消费者读取的转为生产者写入）。由于生产者和消费者不会<b>同时</b>操作<b>同一个</b>缓冲区（不发生冲突），所以就不需要在读写<b>每一个</b><a href="../../2009/03/producer-consumer-pattern-1-data.html">数据单元</a>的时候都进行同步/互斥操作。（顺便提一下，这又一次展现了【空间换时间】的优化思路）<br />&#12288;&#12288;但是光有俩缓冲区还不够。为了真正做到“不冲突”，还得再搞两个互斥锁（简称 La 和 Lb），分别对应俩缓冲区。生产者或消费者如果要操作某个缓冲区，必须先拥有对应的互斥锁。补充一句：要达到“不冲突”的效果，其实可以有多种搞法，今天只是挑一个简单的来聊。<br /><br /><h2>★双缓冲区的几种状态</h2><br />&#12288;&#12288;为了加深某些同学的理解，再描述一下双缓冲区的几种状态。<br /><br /><h3>◇俩缓冲区都在使用的状态（并发读写）</h3><br />&#12288;&#12288;大多数情况下，生产者和消费者都处于并发读写状态。不妨设生产者写入 A，消费者读取 B。在这种状态下，生产者拥有锁 La；同样的，消费者拥有锁 Lb。由于俩缓冲区都是处于独占状态，因此每次读写缓冲区中的元素（<a href="../../2009/03/producer-consumer-pattern-1-data.html">数据单元</a>）都【不需要】再进行加锁、解锁操作。这是节约开销的主要来源。<br /><br /><h3>◇单个缓冲区空闲的状态</h3><br />&#12288;&#12288;由于两个并发实体的速度会有差异，必然会出现一个缓冲区已经操作完，而另一个尚未操作完。不妨假设生产者快于消费者。<br />&#12288;&#12288;在这种情况下，当生产者把 A 写满的时候，生产者要先释放 La（表示它已经不再操作 A），然后尝试获取 Lb。由于 B 还没有被读空，Lb 还被消费者持有，所以生产者进入发呆（Suspend）状态。<br /><br /><h3>◇缓冲区的切换</h3><br />&#12288;&#12288;接着上面的话题。<br />&#12288;&#12288;过了若干时间，消费者终于把 B 读完。这时候，消费者也要先释放 Lb，然后尝试获取 La。由于 La 刚才已经被生产者释放，所以消费者能立即拥有 La 并开始读取 A 的数据。而由于 Lb 被消费者释放，所以刚才发呆的生产者会缓过神来（Resume）并拥有 Lb，然后生产者继续往 B 写入数据。<br />&#12288;&#12288;经过上述几个步骤，俩缓冲区完成了对调，变为：生产者写入 B，消费者读取 A。<br /><br /><h2>★可能的并发问题</h2><br />&#12288;&#12288;本来单个缓冲区的生产者/消费者问题就已经是教科书的经典问题了，现在搞出俩缓冲区，所以就更加耗费脑细胞了。一不小心，就会搞出些并发的Bug，而且并发的Bug还很难调试和测试（这也就是为啥不要轻易使用该玩意儿的原因）。<br /><br /><h3>◇死锁的问题</h3><br />&#12288;&#12288;假如把前面介绍的操作步骤调换一下顺序：生产者或消费者在操作完当前的缓冲区之后，先去获取另一个缓冲区的锁，再来释放当前缓冲区的锁。那会咋样捏？<br />&#12288;&#12288;一旦两个并发实体【同时】处理完各自缓冲区，然后【同时】去获取对方拥有的锁，那就会出现典型的死锁（死锁的详细解释参见“<a href="https://en.wikipedia.org/wiki/Deadlock" target="_blank" rel="nofollow">这里</a>”）场景。它俩从此陷入万劫不复的境地。<br /><br /><h2>★应用场景</h2><br />&#12288;&#12288;介绍完并发问题，按照<a href="../../2009/03/producer-consumer-pattern-0-overview.html">本系列</a>的惯例，最后再来介绍一下双缓冲区在某些场合的应用。<br /><br /><h3>◇用于并发线程</h3><br />&#12288;&#12288;在线程方式下，首先要考虑的是缓冲区的类型：到底用队列方式还是环形方式。这方面的选择依据在<a href="../../2009/04/producer-consumer-pattern-3-circle.html">介绍环形缓冲区</a>的时候已经阐述过了，此处不再啰嗦（省去不少口水）。<br />&#12288;&#12288;另一个需要注意的是，某些编程语言或者程序库提供了的线程安全的缓冲区（比如 JDK 1.5 引入的 <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/ArrayBlockingQueue.html" target="_blank" rel="nofollow">ArrayBlockingQueue</a>）。由于这种缓冲区会自动为每次的读写进行同步/互斥，所以就把双缓冲的优势抵消掉了。因此，大伙儿在进行缓冲区选型的时候要避开这类缓冲区。<br /><br /><h3>◇用于并发进程</h3><br />&#12288;&#12288;在进程间使用双缓冲，先得考察不同 IPC 类型的特点。由于今天讨论双缓冲的目的是降低同步/互斥的开销，对于那些已经封装了同步/互斥的 IPC 类型，就没太大必要再去搞双缓冲了（单凭这条就足以让好多种 IPC 出局）。剩下的 IPC 类型中，比较适合用双缓冲的主要是：共享内存和文件。非常凑巧，这两个玩意儿的特点和适用范围在<a href="../../2009/04/producer-consumer-pattern-3-circle.html">环形缓冲区的帖子</a>里面也已经介绍过了，俺又可以节省不少口水 :)<br /><br /><a href="../../2009/03/producer-consumer-pattern-0-overview.html#index">回到本系列的目录</a><div class="blogger-post-footer">
+</div>
+<hr/>
+<div class="copyright">
+<h4>版权声明</h4>
+本博客所有的原创文章，作者皆保留版权。转载必须包含本声明，保持本文完整，并以超链接形式注明作者<a href="mailto:program.think@gmail.com">编程随想</a>和本文原始网址：<br>
+<a href="https://program-think.blogspot.com/2009/04/producer-consumer-pattern-4-double.html">https://program-think.blogspot.com/2009/04/producer-consumer-pattern-4-double.html</a>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Python script by program.think@gmail.com" />
+<meta name="provider" content="program-think.blogspot.com" />
+<link type="text/css" rel="stylesheet" href="../../css/program-think.css" />
+<title>书评：《C++ 101编程规范》 - 编程随想的博客</title>
+</head>
+<body>
+<div id="main" style="width:100%;">
+<h1><a href="../../index.html" title="回到首页">书评：《C++ 101编程规范》</a></h1>
+<div class="post-info"><span class="date-header">2009-01-22</span><a href="../../tags/E4B9A6E8AF842FE5BDB1E8AF84.html" class="tag">书评/影评</a> <a href="../../tags/E7BC96E7A88B.html" class="tag">编程</a> <a href="../../tags/E7BC96E7A88B.C.html" class="tag">编程.C</a> </div>
+<hr/>
+<div class="post">
+&#12288;&#12288;今天是头一次聊 C++ 的书，当然要选一本够分量又实用的书。俺想了一炷香的功夫，决定先拿《C++ Coding Standards: 101 Rules, Guidelines, and Best Practices 》开刀。<a name='more'></a><!--program-think--><br />&#12288;&#12288;上次俺在《<a href="../../2009/01/choose-it-book.html">如何选择 IT 技术书籍</a>》中已经介绍了几个鉴别好书的招数，现在可以验证一下。<br /><br />&#12288;&#12288;先说说此书的作者 Herb Sutter 和 Andrei Alexandrescu。两位都是 C++ 社区的大牛。其中 Herb Sutter 是标准委员会的主席（光看头衔就知道有多牛了）。Andrei Alexandrescu 是《Modern C++ Design》的作者，大凡看过此书的人应该都会被他极具创新的 C++ 模板用法所震惊。鉴于两位作者的分量，大伙儿可以想见该书一定不差。<br />&#12288;&#12288;然后看看出版时间是2004年，在 C++ 98 和 C++ 03 标准之后，因此肯定已经涵盖了 C++ 语言新标准的东东。本书的出版社“Addison Wesley”也是国际知名。因此从“出版信息”看，这本书也符合要求。<br />&#12288;&#12288;再然后，看看目录。在本书之前，俺曾看过许多关于编码规范的书或者文章，但是都仅仅局限于语法层面。而这本书的出众之处在于用了很大的比重来介绍语法之外的条款（例如性能优化、类设计、STL 库的使用）。由此看来，本书可以适合不同层次的 C++ 开发人员，即使你是用 C++ 写了多年程序的老手也会从中获益。<br /><br />&#12288;&#12288;啰嗦了一大堆好处（你估计看烦了），现在开始来具体介绍一下内容。全书的101个条款分布在如下的12部分中，下面来挨个介绍一下。（如果你已经通读过全书，后面内容你可以略过）<br /><br /><b>1、组织与策略</b><br />这部分其实不是讲 C++，而是更偏向于软件工程方面。如果你是一个部门或者团队的主管，要仔细思考一下：这些条款你的团队/部门是否都做到了？如果你是一个 C++ 新手，可以先略过这部分。<br /><br /><b>2、设计风格</b><br />这部分讲的是通用程序设计哲学，并不限于 C++，而是适用于所有的编程语言。如果你对 C++ 已经入门，但是想再上一个境界，本部分你必须好好领会。我估计有十年编程经验的老手也未必能够完全吃透该部分的所有条款。<br /><br /><b>3、编码风格</b><br />终于开始说到C++语法了！本部分说得都是一些基本的东东，C++ 新手要好好看看这部分，老手倒未必了。<br /><br /><b>4、函数与操作符（运算符）</b><br />如果你是从其它语言 Java 和 C 转到 C++，可能对操作符重载还不适应，需要了解一下这部分。如果你原来是 Python 程序员，估计对操作符重载，应该会比较有亲切感。<br /><br /><b>5、类设计和继承</b><br />最好你已经有了一定的 OOP 理论功底，然后再来看这部分，效果会更好。<br /><br /><b>6、构造、析构、拷贝</b><br />这部分读起来的难度不大。不过有几个几个细节需要注意（即使你已是熟手）。<br /><br /><b>7、名空间和模块</b><br />如果你需要从事规模比较大的 C++ 项目的开发，那么本部分一定要了解一下。比较大的项目一般都会涉及到逻辑分割（切分名空间）和物理分割（划分模块）。<br /><br /><b>8、模板与范型</b><br />这部分适合已经比较熟悉 C++ 的开发人员，新手可以先略过。<br /><br /><b>9、错误处理与异常</b><br />错误和异常的处理，是编程领域公认的难点。头几条是关于原理性的条款（因此也适用于其它语言），需要深刻领会；后几条是关于 C++ 语法，你如果对 try/catch 不熟悉的话要注意看看了（即使是2-3年开发经验的，也有许多不熟悉异常处理）。<br /><br /><b>10、STL 容器 & 11、STL 算法</b><br />如果你是从其它语言（Java、C）转到 C++，或者你原先只用MFC，那么估计你的 STL 会有欠缺，好好看看这两部分吧。<br /><br /><b>12、类型安全</b><br />如果你是从 C 转到 C++，这部分尤其要注意看一下。里面提到的几个条款都是和C的缺点有关（这么说，C 语言的 fans 看了可别动怒啊）。<br /><br />&#12288;&#12288;听完俺滴介绍，感觉怎么样？想去弄一本来看看吗？<br />&#12288;&#12288;此书的电子版已经上传到网盘。想看的同学，请猛击“<a href="https://github.com/programthink/books" target="_blank">俺收藏的电子书目录</a>”。<div class="blogger-post-footer">
+</div>
+<hr/>
+<div class="copyright">
+<h4>版权声明</h4>
+本博客所有的原创文章，作者皆保留版权。转载必须包含本声明，保持本文完整，并以超链接形式注明作者<a href="mailto:program.think@gmail.com">编程随想</a>和本文原始网址：<br>
+<a href="https://program-think.blogspot.com/2009/01/cxx-coding-standards-101-rules.html">https://program-think.blogspot.com/2009/01/cxx-coding-standards-101-rules.html</a>
+</div>
+</div>
+</body>
+</html>

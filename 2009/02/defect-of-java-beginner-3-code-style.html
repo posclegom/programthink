@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Python script by program.think@gmail.com" />
+<meta name="provider" content="program-think.blogspot.com" />
+<link type="text/css" rel="stylesheet" href="../../css/program-think.css" />
+<title>Java 新手的通病[3]：缺少良好的编程习惯 - 编程随想的博客</title>
+</head>
+<body>
+<div id="main" style="width:100%;">
+<h1><a href="../../index.html" title="回到首页">Java 新手的通病[3]：缺少良好的编程习惯</a></h1>
+<div class="post-info"><span class="date-header">2009-02-04</span><a href="../../tags/E7BC96E7A88B.html" class="tag">编程</a> <a href="../../tags/E7BC96E7A88B.Java.html" class="tag">编程.Java</a> </div>
+<hr/>
+<div class="post">
+&#12288;&#12288;上次聊了“<a href="../../2009/01/defect-of-java-beginner-2-oo.html">缺乏面向对象基本功</a>”，今天来说说编程习惯的问题。今天说的这些坏习惯大部分都是跨语言的（C++、Python 新手也有），而且大部分都需要靠平时不断地努力才能慢慢改掉。<a name='more'></a><!--program-think--><br /><br /><a name="naming"> </a><br /><h2>★随意地命名</h2><br />&#12288;&#12288;有些新手写程序，当需要定义某个变量名（也可能是函数名、类名、包名等）时，随意地一敲键盘，名字就起好了......若干星期后，碰到某 bug，再来看自己写的代码时，心中暗自嘀咕：“这代码是我写的吗？咋都看不懂捏？”<br />&#12288;&#12288;所以我常跟新来的菜鸟说，命名不规范害死人啊！鉴于该问题相当普遍，我整理了几种典型的作为反面教材，具体如下：使用单字母命名变量；使用一些没太大意义的变量名（例如 s1、s2、s3）；对同一个业务概念使用不同的术语/缩写（容易让读代码的人神经分裂）；使用拼音命名（如果你团队中有港台人士或者老外，就惨了）。<br /><br /><a name="copy_and_paste"> </a><br /><h2>★习惯于代码的 copy &amp; paste</h2><br />&#12288;&#12288;这是一个很普遍的问题。很多新手写代码的时候，如果发现要写的某个函数和前几天写的某个函数差不多，就把原来的那个函数贴过来，然后稍微改几下，心中还暗喜：“又快速搞定了一个功能”......<br />&#12288;&#12288;同学，如果你也喜欢这么干，可要注意了。这种做法是代码臭味（借用《重构 - 改善既有代码的设计》的提法）的主要来源，导致代码可维护性大大下降。当你将来需要增加功能或修改 bug 的时候，要同时改动多个地方，而那时你估计已经想不起来这砣代码有几个克隆了。<br /><br /><a name="magic_number"> </a><br /><h2>★Magic Number 满天飞</h2><br />&#12288;&#12288;如果你没有听说过“Magic Number”，先看“<a href="https://en.wikipedia.org/wiki/Magic_number_(programming)#Unnamed_numerical_constant" target="_blank" rel="nofollow">这里</a>”了解一下。<br />为了说明Magic Number的问题，咱找个例子来说事儿：假设有个业务逻辑中需要进行10秒的超时等待，你会怎么写这个sleep语句？我估计大部分人不外乎下面三种写法：<br />1、直接写上 <code>sleep(10*1000);</code> 了事<br />2、定义一个常量 <code>TIMEOUT_XXX = 10*1000;</code> 然后 <code>sleep(TIMEOUT_XXX);</code><br />3、在配制文件中加入一个超时项，然后程序读取配制文件获得超时值，然后调用 sleep。（此处提到的“配置文件”是广义的，泛指各种可用于存储配置信息的机制，如：xml 文件、ini 文件、数据库 ...）<br />&#12288;&#12288;如果你的做法类似于写法1，你多半喜欢随手硬编码。硬编码不光缺乏可读性，而且具有和“代码拷贝粘贴”类似的代码臭味（可能会存在多个 Magic Number 克隆），不利于日后维护。<br />&#12288;&#12288;至于写法2，比写法1稍好（至少可读性好了）。但是，将来一旦发生需求变更，要求在【运行时】调整超时间隔（甚至要求让用户来配制超时间隔），则写法2的缺点立马暴露无遗。<br /><br /><a name="coupling"> </a><br /><h2>★代码耦合度太大</h2><br />&#12288;&#12288;每当说到 MVC 或者设计模式，几乎每个 Java 开发人员都能说得头头是道？但是说归说，真正写代码的时候，鲜有人写出的代码是层次清楚的。至于说到代码耦合分别由哪些情况引起？什么是正交的设计？（关于耦合与正交设计，我后面会专门讨论一下）能完全搞明白的人就更少了。<br />&#12288;&#12288;所以很多 Java 新手的代码耦合度大也就不足为奇了。我曾经抽查过试用期员工的代码，各种业务逻辑纠缠在一起，代码臭味都要熏死人。想重构都无从下手，只好让他推倒重写。<br /><br /><a name="gc"> </a><br /><h2>★被 GC 宠坏</h2><br />&#12288;&#12288;由于 Java 在语言层面提供了内存的垃圾回收机制，程序员只管申请内存，不需要再关心释放的问题。因此很多新手养成了坏习惯，对于其它资源（比如数据库连接）也只申请不释放（有些人甚至天真地以为 JVM 会帮你搞定资源回收）。<br />&#12288;&#12288;还有些人虽然知道资源需要释放，但是常常忘记（比如写了打开数据库连接和相关代码，【即将】写关闭数据库连接时，突然有人叫你去吃中饭，回来后就把这茬给忘了）。<br />&#12288;&#12288;这个坏习惯会导致资源的泄露，而资源泄露往往比内存泄露更要命。如果你写的程序是长时间运行的（比如运行在 Web Server 上），时间长了会由于资源耗尽而导致整个进程出问题。<br /><br /><br />下一个帖子，聊一下“<a href="../../2009/02/defect-of-java-beginner-4-exception.html">异常处理使用不当</a>”。<div class="blogger-post-footer">
+</div>
+<hr/>
+<div class="copyright">
+<h4>版权声明</h4>
+本博客所有的原创文章，作者皆保留版权。转载必须包含本声明，保持本文完整，并以超链接形式注明作者<a href="mailto:program.think@gmail.com">编程随想</a>和本文原始网址：<br>
+<a href="https://program-think.blogspot.com/2009/02/defect-of-java-beginner-3-code-style.html">https://program-think.blogspot.com/2009/02/defect-of-java-beginner-3-code-style.html</a>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,210 @@
+body {
+  margin: 0px;
+  font-size: small;
+  background-color: #f0f0f0;
+  color: #000000;
+}
+#main {
+  float: left;
+  padding-bottom: 20px;
+  padding: 0px;
+  font: normal normal 100% 'Trebuchet MS', verdana, sans-serif;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+#content-wrapper {
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0;
+  margin-left: 5px;
+}
+
+h1 {
+  font-size: 300%;
+  font-weight: bold;
+  line-height: 120%;
+  text-align: center;
+}
+h4 {
+  font-size: 120%;
+  font-weight: bold;
+}
+
+.post-info {
+  text-align: left;
+  font-weight: normal;
+}
+
+.post-info .date-header {
+  font-size: 125%;
+  padding: 1px 50px 1px 20px;
+  color: #808080;
+}
+
+.post-info .tag {
+  font-size: 100%;
+  padding: 1px;
+  padding-left: 15px;
+}
+
+.post {
+  padding: 0px 20px 0px 20px;
+  margin-bottom: 20px;
+  line-height: 22px;
+}
+
+.post h2 {
+  font-size: 150%;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 0px 0px 0px 22px;
+}
+.post h3 {
+  font-size: 130%;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 0px 0px 0px 22px;
+}
+.post h4 {
+  font-size: 110%;
+  font-weight: bold;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding: 0px 0px 0px 22px;
+}
+
+.post blockquote {
+  margin-left: 2em;
+  margin-right: 2em;
+  background-color: #DDDDDD;
+  border: 0px none;
+}
+.post q {
+  background-color: #DDDDDD;
+}
+
+.post pre, .post code {
+  background-color: #DDDDDD;
+  font-family: Courier,monospace;
+}
+
+
+.post a[target="_blank"] {
+  background: transparent url(../images/external_link.gif) no-repeat scroll right center;
+  padding-right: 13px;
+}
+
+a {
+  text-decoration: none;
+  color: #0066FF;
+}
+a:hover {
+  text-decoration: underline;
+  color: #88BBFF;
+}
+a img {
+  border: 0;
+}
+a:visited {
+  color: #800080;
+}
+#sidebar a {
+  color: #0066FF;
+}
+#sidebar a:visited {
+  color: #800080;
+}
+#sidebar a:hover {
+  color: #88BBFF;
+}
+#sidebar {
+  text-transform: none;
+  background-color: #ffffff;
+  color: #000000;
+  padding-left: 20px;
+  width: 30%;
+  float: right;
+  font: normal normal 100% 'Trebuchet MS', verdana, sans-serif;
+  border-left: 2px dashed #000000;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+.sidebar h2 {
+  font-weight: bold;
+  font-size: 120%;
+  color: #000000;
+}
+.sidebar h3 {
+  font-weight: bold;
+  font-size: 100%;
+  color: #000000;
+}
+.sidebar .widget {
+  padding: 4px 8px 0px 0px;
+}
+
+
+/*--@ Source code syntax highlight @--*/
+
+.source .hll { background-color: LightYellow; }
+.source  { background: DarkSlateGray; }
+.source .k { color: DodgerBlue; font-weight: bold; } /* Keyword */
+.source .kt { color: DodgerBlue; font-weight: bold; } /* Keyword.Type */
+.source .kn { color: DodgerBlue; font-weight: bold; } /* Keyword.Namespace */
+.source .kr { color: DodgerBlue; font-weight: bold; } /* Keyword.Reserved */
+.source .kc { color: DodgerBlue; font-weight: bold; } /* Keyword.Constant */
+.source .kd { color: DodgerBlue; font-weight: bold; } /* Keyword.Declaration */
+.source .kp { color: DodgerBlue; font-weight: bold; } /* Keyword.Pseudo */
+.source .n { color: White; } /* Name */
+.source .nb { color: SteelBlue; font-weight: bold; } /* Name.Builtin */
+.source .bp { color: SteelBlue; font-weight: bold; } /* Name.Builtin.Pseudo */
+.source .nn { color: GoldenRod; font-weight: bold } /* Name.Namespace */
+.source .nc { color: GoldenRod; font-weight: bold; } /* Name.Class */
+.source .nf { color: GoldenRod; font-weight: bold } /* Name.Function */
+.source .no { color: White; } /* Name.Constant */
+.source .nd { color: White; } /* Name.Decorator */
+.source .ne { color: White; } /* Name.Exception */
+.source .nv { color: White; } /* Name.Variable */
+.source .vc { color: White; } /* Name.Variable.Class */
+.source .vg { color: White; } /* Name.Variable.Global */
+.source .vi { color: White; } /* Name.Variable.Instance */
+.source .nl { color: White; } /* Name.Label */
+.source .nt { color: SteelBlue } /* Name.Tag */
+.source .ni { color: SteelBlue; } /* Name.Entity */
+.source .na { color: OliveDrab; } /* Name.Attribute */
+.source .py { color: White; } /* Name.Property */
+.source .nx { color: White; } /* Name.Other */
+.source .m { color: Orchid; } /* Literal.Number */
+.source .mb { color: Orchid; } /* Literal.Number.Bin */
+.source .mi { color: Orchid; } /* Literal.Number.Integer */
+.source .il { color: Orchid; } /* Literal.Number.Integer.Long */
+.source .mo { color: Orchid; } /* Literal.Number.Oct */
+.source .mh { color: Orchid; } /* Literal.Number.Hex */
+.source .mf { color: Orchid; } /* Literal.Number.Float */
+.source .s { color: Chocolate; } /* Literal.String */
+.source .sb { color: Chocolate; } /* Literal.String.Backtick */
+.source .sc { color: Chocolate; } /* Literal.String.Char */
+.source .sd { color: Chocolate; } /* Literal.String.Doc */
+.source .s2 { color: Chocolate; } /* Literal.String.Double */
+.source .se { color: Chocolate; } /* Literal.String.Escape */
+.source .sh { color: Chocolate; } /* Literal.String.Heredoc */
+.source .si { color: Chocolate; } /* Literal.String.Interpol */
+.source .sx { color: Chocolate; } /* Literal.String.Other */
+.source .sr { color: Chocolate; } /* Literal.String.Regex */
+.source .s1 { color: Chocolate; } /* Literal.String.Single */
+.source .ss { color: Chocolate; } /* Literal.String.Symbol */
+.source .o { color: Aqua; } /* Operator */
+.source .ow { color: Aqua; } /* Operator.Word */
+.source .p { color: White; } /* Punctuation */
+.source .c { color: LimeGreen; font-style: italic; } /* Comment */
+.source .ch { color: LimeGreen; font-style: italic; } /* Comment.Hashbang */
+.source .cm { color: LimeGreen; font-style: italic; } /* Comment.Multiline */
+.source .c1 { color: LimeGreen; font-style: italic; } /* Comment.Single */
+.source .cs { color: LimeGreen; font-style: italic; } /* Comment.Special */
+.source .cp { color: SteelBlue; font-weight: bold; font-style: italic; } /* Comment.Preproc */
+.source .cpf { color: LawnGreen; font-style: italic; } /* Comment.PreprocFile */
+.source .x { color: DarkGray; } /* Other */
+
